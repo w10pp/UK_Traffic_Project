@@ -155,6 +155,24 @@ def train_model(clf, X_train, y_train, X_test, y_test):
     get_performance_metrics(y_train, y_train_pred, y_test, y_test_pred, y_train_score, y_test_score, threshold=0.5)
     confusion_heatmap(y_test, y_test_pred)
     plot_roc_curve(y_train, y_train_score, y_test, y_test_score)
+         
+         
+ def train_model_SVC(clf, X_train, y_train, X_test, y_test):
+    clf.fit(X_train, y_train)
+
+    # the LinearSVC doesn't support predict_proba method to calculate the class probabilities
+    y_train_pred = clf.predict(X_train)
+    #y_train_score = clf.predict_proba(X_train)[:, 1]
+    y_train_score = clf.decision_function(X_train)
+
+    y_test_pred = clf.predict(X_test)
+    #y_test_score = clf.predict_proba(X_test)[:, 1]
+    y_test_score = clf.decision_function(X_test)
+
+    get_performance_metrics(y_train, y_train_pred, y_test, y_test_pred, y_train_score, y_test_score, threshold=0.5)
+    confusion_heatmap(y_test, y_test_pred)
+    plot_roc_curve(y_train, y_train_score, y_test, y_test_score)
+
 
 
 ##%%-----------------------------------------------------------------------
@@ -186,10 +204,11 @@ train_model(clf_nb, X_train, y_train, X_test, y_test)
 ##%%-----------------------------------------------------------------------
 # IV. SVM
 
-clf_svm = SVC(kernel='linear', probability=True)
-train_model(clf_svm, X_train, y_train, X_test, y_test)
+#clf_svm = SVC(kernel='linear', probability=True)
+clf_svm = LinearSVC(random_state=100)
+train_model_SVC(clf_svm, X_train, y_train, X_test, y_test)
 
 
 # due to large data size, try boosting ensemble methods
-clf_boost = AdaBoostClassifier(LinearSVC(random_state=100))
+clf_boost = AdaBoostClassifier(LinearSVC(random_state=100), algorithm='SAMME')
 train_model(clf_boost, X_train, y_train, X_test, y_test)
